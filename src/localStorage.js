@@ -1,3 +1,4 @@
+const { symbolCurrencyAnalizer } = require("./utils");
 
 
 class LocalStorage {
@@ -39,6 +40,8 @@ class LocalStorage {
         this.data[index] = client;
       }
     }
+
+    value = symbolCurrencyAnalizer(value);
 
     if (!this.instruments.some(row => row === value)) {
       this.instruments.push(value);

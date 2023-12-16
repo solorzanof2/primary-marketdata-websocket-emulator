@@ -3,14 +3,29 @@ const { threadSleep, getRandomFromList, getRandomNumber, getRandomFromRange } = 
 
 
 // FIXME maybe this can be handled as configuration on demand
-const MINIMAL = 30000;
-const MAXIMUM = 58000;
+// const MINIMAL = 30000;
+// const MAXIMUM = 58000;
 
 
 class MarketEngine {
   static turnOn = true;
 
-  static marketData = async (callback) => {
+  static limits = {
+    ARS: {
+      Minimum: 30000,
+      Maximum: 58000,
+    },
+    USD: {
+      Minimum: 30,
+      Maximum: 70,
+    },
+  };
+
+  static async marketData(callback) {
+    if (!MarketEngine.turnOn) {
+      MarketEngine.turnOn = true;
+    }
+
     let data;
     let clients;
     let client;
@@ -21,7 +36,7 @@ class MarketEngine {
 
       await threadSleep(getRandomNumber(500));
 
-      data = marketEmulator();
+      data = MarketEngine.#marketEmulator();
 
       clients = LocalStorage.findAllByValue(data.instrumentId.symbol);
 
@@ -37,33 +52,45 @@ class MarketEngine {
       callback(clients);
     }
   }
-}
 
+  static #marketEmulator() {
+    const symbol = getRandomFromList(LocalStorage.instruments);
 
-const marketEmulator = () => {
-  const symbol = getRandomFromList(LocalStorage.instruments);
-  return {
-    type: "Md",
-    timestamp: Date.now(),
-    instrumentId: {
-      marketId: "ROFX",
-      symbol,
-    },
-    marketData: {
-      CL: {
-        price: getRandomFromRange(MINIMAL, MAXIMUM),
-        date: Date.now(),
+    const [
+      currency, symbolValue,
+    ] = symbol.split('::');
+
+    const {
+      Minimum, Maximum,
+    } = MarketEngine.limits[currency];
+
+    return {
+      type: "Md",
+      timestamp: Date.now(),
+      instrumentId: {
+        marketId: "ROFX",
+        symbol: symbolValue,
       },
-      BI: [],
-      OF: [],
-      LA: {
-        price: getRandomFromRange(MINIMAL, MAXIMUM),
-        size: 0,
-        date: Date.now(),
+      marketData: {
+        CL: {
+          price: getRandomFromRange(Minimum, Maximum),
+          date: Date.now(),
+        },
+        BI: [],
+        OF: [],
+        LA: {
+          price: getRandomFromRange(Minimum, Maximum),
+          size: 0,
+          date: Date.now(),
+        },
       },
-    },
+    }
+  };
+
+  static stop() {
+    MarketEngine.turnOn = false;
   }
-};
+}
 
 module.exports = {
   MarketEngine,

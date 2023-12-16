@@ -9,9 +9,30 @@ const getRandomFromList = (collection) => collection[Math.floor(Math.random() * 
 
 const threadSleep = async (millis) => new Promise(resolve => setTimeout(resolve, millis));
 
+const symbolCurrencyAnalizer = (value) => {
+  const [
+    merv,
+    xmev,
+    instrument,
+    payType,
+  ] = value.split(' - ');
+
+  const instrumentChars = instrument.split('');
+
+  const lastChar = instrumentChars.pop();
+
+  let prefix = 'ARS';
+  if (lastChar === 'D') {
+    prefix = 'USD';
+  }
+
+  return `${prefix}::${value}`;
+}
+
 module.exports = {
   getRandomFromRange,
   getRandomNumber,
   getRandomFromList,
   threadSleep,
+  symbolCurrencyAnalizer,
 }

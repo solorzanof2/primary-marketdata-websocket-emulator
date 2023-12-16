@@ -49,6 +49,10 @@ class WebsocketServer {
 
       websocket.on('close', () => {
         console.log(`[INFO] WEBSOCKET_SERVER Connection has been closed...`);
+        if (LocalStorage.length === 1) {
+          MarketEngine.stop();
+        }
+
         LocalStorage.removeSubscription(websocket.uid);
       });
 
