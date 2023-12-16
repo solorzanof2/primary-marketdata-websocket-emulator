@@ -1,21 +1,47 @@
 const LocalStorage = require("./localStorage");
-const { threadSleep, getRandomFromList, getRandomNumber, getRandomFromRange } = require("./utils")
+const { threadSleep, getRandomFromList, getRandomNumber, getRandomFromRange } = require("./utils");
 
 
 // FIXME maybe this can be handled as configuration on demand
 const MINIMAL = 30000;
 const MAXIMUM = 58000;
 
-const marketData = async (callback) => {
-  while (true) {
-    await threadSleep(getRandomNumber(1000));
 
-    callback(marketEmulator());
+class MarketEngine {
+  static turnOn = true;
+
+  static marketData = async (callback) => {
+    let data;
+    let clients;
+    let client;
+    while (true) {
+      if (!MarketEngine.turnOn) {
+        break;
+      }
+
+      await threadSleep(getRandomNumber(500));
+
+      data = marketEmulator();
+
+      clients = LocalStorage.findAllByValue(data.instrumentId.symbol);
+
+      if (!clients?.length) {
+        LocalStorage.removeInstrument(data.instrumentId.symbol);
+        continue;
+      }
+
+      for (client of clients) {
+        client.data = data;
+      }
+
+      callback(clients);
+    }
   }
 }
 
+
 const marketEmulator = () => {
-  const symbol = getRandomFromList(LocalStorage.getAll());
+  const symbol = getRandomFromList(LocalStorage.instruments);
   return {
     type: "Md",
     timestamp: Date.now(),
@@ -40,6 +66,6 @@ const marketEmulator = () => {
 };
 
 module.exports = {
-  marketData,
+  MarketEngine,
 }
 

@@ -1,6 +1,7 @@
 const { WebSocket } = require("ws");
-const { marketData } = require("./marketData");
+const { MarketEngine } = require("./marketData");
 const LocalStorage = require("./localStorage");
+const Security = require("./security");
 
 
 class WebsocketServer {
@@ -12,6 +13,7 @@ class WebsocketServer {
     this.#starterLog();
 
     const callback = async (websocket) => {
+      websocket.uid = Security.getRandomGUID();
 
       websocket.on('message', (message) => {
         const payload = JSON.parse(message);
@@ -30,12 +32,16 @@ class WebsocketServer {
           }
 
           for (const instrument of payload.products) {
-            LocalStorage.setItem(instrument.symbol);
+            LocalStorage.setItem(websocket.uid, instrument.symbol);
           }
 
-          marketData((result) => {
+          MarketEngine.marketData((results) => {
             for (const client of WebsocketServer.instance.clients) {
-              client.send(JSON.stringify(result));
+              for (const result of results) {
+                if (result.uid === client.uid) {
+                  client.send(JSON.stringify(result.data));
+                }
+              }
             }
           });
         }
@@ -43,6 +49,7 @@ class WebsocketServer {
 
       websocket.on('close', () => {
         console.log(`[INFO] WEBSOCKET_SERVER Connection has been closed...`);
+        LocalStorage.removeSubscription(websocket.uid);
       });
 
       console.log(`[INFO] WEBSOCKET_SERVER A Websocket Client has been connected...`);
