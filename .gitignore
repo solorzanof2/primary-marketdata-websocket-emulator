@@ -1,0 +1,17 @@
+node_modules
+.env
+.vscode
+.vscode/*
+.serverless
+.webpack
+dist
+lib
+.serverless/*
+.dynamodb/*
+package-lock.json
+.esbuild/*
+.stash
+
+seeds/.backups
+media
+media/*
