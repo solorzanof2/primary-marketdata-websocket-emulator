@@ -1,25 +1,29 @@
 const LocalStorage = require("./localStorage");
-const { threadSleep, getRandomFromList, getRandomNumber, getRandomFromRange } = require("./utils");
+const {
+  threadSleep,
+  getRandomFromList,
+  getRandomNumber,
+  getRandomDecimals,
+  getPercentValueFromPrice,
+  doOperation,
+} = require("./utils");
 
-
-// FIXME maybe this can be handled as configuration on demand
-// const MINIMAL = 30000;
-// const MAXIMUM = 58000;
 
 
 class MarketEngine {
   static turnOn = true;
 
+  // FIXME maybe this can be handled as configuration on demand
   static limits = {
     ARS: {
-      Minimum: 30000,
-      Maximum: 58000,
+      CL: 58000,
     },
     USD: {
-      Minimum: 30,
-      Maximum: 70,
+      CL: 70,
     },
   };
+
+  static bias = 1;
 
   static async marketData(callback) {
     if (!MarketEngine.turnOn) {
@@ -61,8 +65,20 @@ class MarketEngine {
     ] = symbol.split('::');
 
     const {
-      Minimum, Maximum,
+      CL,
     } = MarketEngine.limits[currency];
+
+    let basePrice = +CL;
+    const symbolLastPricing = LocalStorage.getSymbolLastPricing(symbolValue);
+    if (symbolLastPricing) {
+      basePrice = +symbolLastPricing.value;
+    }
+
+    const percent = getRandomDecimals(0, this.bias);
+    const percentValue = getPercentValueFromPrice(basePrice, percent);
+    const price = doOperation(basePrice, percentValue);
+
+    LocalStorage.setPricing(symbolValue, price);
 
     return {
       type: "Md",
@@ -73,13 +89,13 @@ class MarketEngine {
       },
       marketData: {
         CL: {
-          price: getRandomFromRange(Minimum, Maximum),
+          price: CL,
           date: Date.now(),
         },
         BI: [],
         OF: [],
         LA: {
-          price: getRandomFromRange(Minimum, Maximum),
+          price,
           size: 0,
           date: Date.now(),
         },

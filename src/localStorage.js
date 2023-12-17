@@ -7,6 +7,8 @@ class LocalStorage {
 
   static instruments = [];
 
+  static symbolPricing = [];
+
   static get length() {
     return this.data.length;
   }
@@ -67,8 +69,7 @@ class LocalStorage {
     // check if any other client has the same value in its collection
     // before remove it from the instruments list;
     if (!this.data.some(row => row.collection.some(innerRow => innerRow === value))) {
-      const instrumentIndex = this.instruments.findIndex(row => row === value);
-      this.instruments.splice(instrumentIndex, 1);
+      this.removeInstrument(value);
     }
 
     const index = client.collection.findIndex(row => row === value);
@@ -89,13 +90,38 @@ class LocalStorage {
 
     for (const instrument of client.collection) {
       if (!this.data.some(row => row.collection.some(innerRow => innerRow === instrument))) {
-        const instrumentIndex = this.instruments.findIndex(row => row === value);
-        this.instruments.splice(instrumentIndex, 1);
+        this.removeInstrument(value);
       }
     }
 
     const index = this.data.findIndex(row => row.uid === key);
     this.data.splice(index, 1);
+  }
+
+  static setPricing(value, symbol) {
+    let current = this.symbolPricing.find(row => row.symbol === symbol);
+
+    if (!current) {
+      current = {
+        symbol,
+        value,
+      }
+
+      this.symbolPricing.push(current);
+      return;
+    }
+
+    const length = this.symbolPricing.length;
+    for (let index = 0; index < length; index++) {
+      if (this.symbolPricing[index].symbol !== symbol) continue;
+
+      this.symbolPricing[index].value = value;
+      break;
+    }
+  }
+
+  static getSymbolLastPricing(symbol) {
+    return this.symbolPricing.find(row => row.symbol === symbol);
   }
 
 }
