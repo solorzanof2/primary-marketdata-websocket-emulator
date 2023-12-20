@@ -13,6 +13,11 @@ const getRandomFromList = (collection) => collection[Math.floor(Math.random() * 
 const threadSleep = async (millis) => new Promise(resolve => setTimeout(resolve, millis));
 
 const symbolCurrencyAnalizer = (value) => {
+  let prefix = 'ARS';
+  if (!String(value).includes(' - ')) {
+    return `${prefix}::${value}`;
+  }
+
   const [
     merv,
     xmev,
@@ -24,7 +29,6 @@ const symbolCurrencyAnalizer = (value) => {
 
   const lastChar = instrumentChars.pop();
 
-  let prefix = 'ARS';
   if (lastChar === 'D') {
     prefix = 'USD';
   }

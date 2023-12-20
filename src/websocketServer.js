@@ -2,6 +2,7 @@ const { WebSocket } = require("ws");
 const { MarketEngine } = require("./marketData");
 const LocalStorage = require("./localStorage");
 const Security = require("./security");
+const { Market } = require("./market");
 
 
 class WebsocketServer {
@@ -17,6 +18,10 @@ class WebsocketServer {
 
       websocket.on('message', (message) => {
         const payload = JSON.parse(message);
+
+        if (payload === 'ping') {
+          return;
+        }
 
         if (!('type' in payload)) {
           websocket.send(JSON.stringify({
@@ -42,6 +47,22 @@ class WebsocketServer {
                   client.send(JSON.stringify(result.data));
                 }
               }
+            }
+          });
+        }
+
+        if (payload.type === 'os') {
+          console.log(`[INF0] order subscription has been received...`);
+          console.log({payload});
+        }
+
+        if (payload.type === 'no') {
+          console.log(`[INF0] order has been sent...`);
+          Market.sendOrder(payload, (executionReport) => {
+            for (const client of WebsocketServer.instance.clients) {
+              // if (result.uid === client.uid) {
+              client.send(JSON.stringify(executionReport));
+              // }
             }
           });
         }
