@@ -1,0 +1,74 @@
+// ACCOUNT LISTENER
+{
+	"type": "os",
+	"account": {
+		"id": "REM7831"
+	}
+}
+
+// MARKET DATA SUBSCRIPTION
+{
+	"type": "smd",
+	"level": 1,
+	"entries": [
+			"LA",
+			"OF",
+			"CL",
+			"BI"
+	],
+	"products": [
+			{
+				"symbol": "MERV - XMEV - CP30O - CI",
+				"marketId": "ROFX"
+			},
+			{
+				"symbol": "MERV - XMEV - CP30D - CI",
+				"marketId": "ROFX"
+			}
+	],
+	"depth": 5
+}
+
+// ORDEN DE COMPRA
+{
+	"type":"no",
+	"product": {
+		"symbol":"MERV - XMEV - CP30O - CI",
+		"marketId":"ROFX"
+	},
+	"price": 59000,
+	"quantity": 100,
+	"side": "BUY",
+	"account": "LH3",
+	"ordType": "LIMIT",
+	"wsClOrdId": "LH3:000000000006"
+}
+
+{
+	"type":"no",
+	"product": {
+		"symbol":"MERV - XMEV - CP30O - CI",
+		"marketId":"ROFX"
+	},
+	"price": 59000,
+	"quantity": 100,
+	"side": "SELL",
+	"account": "REM7831",
+	"ordType": "LIMIT",
+	"wsClOrdId": "REM7831:000000000006"
+}
+
+// ORDEN DE VENTA
+{
+	"type":"no",
+	"product": {
+		"symbol":"MERV - XMEV - CP30D - CI",
+		"marketId":"ROFX"
+	},
+	"price": 31,
+	"quantity": 100,
+	"side": "SELL",
+	"account": "REM7831",
+	"ordType": "LIMIT",
+	"wsClOrdId": "LH3:000000000006"
+}

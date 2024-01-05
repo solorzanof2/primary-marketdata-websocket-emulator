@@ -1,0 +1,17 @@
+{
+  "type": "smd",
+  "level": 1,
+  "entries": [
+      "LA",
+      "OF",
+      "CL",
+      "BI"
+  ],
+  "products": [
+      {
+        "symbol": "MERV - XMEV - LOC2O - 48hs",
+        "marketId": "ROFX"
+      }
+  ],
+  "depth": 5
+}

@@ -9,6 +9,8 @@ class LocalStorage {
 
   static symbolPricing = [];
 
+  static limitOrders = [];
+
   static get length() {
     return this.data.length;
   }
